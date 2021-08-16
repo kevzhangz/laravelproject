@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,12 +23,10 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return view('about', [
         'title' => 'About',
-        'name' => 'Kevin'
+        'name' => 'Kevin',
+        'img' => 'hhh.png'
     ]);
 });
 
-Route::get('/blog', function () {
-    return view('posts', [
-        'title' => 'Blog'
-    ]);
-});
+Route::get('/blog', [PostController::class, 'index']);
+Route::get('/blog/{post:slug}', [PostController::class, 'show']);
