@@ -7,7 +7,7 @@
     @foreach($categories as $category)
         <ul>
             <li>
-                <h2><a href="/categories/{{ $category->slug }}">{{ $category->name }}</a></h2>
+                <h2><a class="text-decoration-none" href="/categories/{{ $category->slug }}">{{ $category->name }}</a></h2>
             </li>
         </ul>
             
