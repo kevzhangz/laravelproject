@@ -6,10 +6,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <ul class="navbar-nav">
-            <li><a class="nav-link {{ ($active === "home") ? 'active' : '' }}" href="/">Home</a></li>
-            <li><a class="nav-link {{ ($active === "about") ? 'active' : '' }}" href="/about">About</a></li>
-            <li><a class="nav-link {{ ($active === "categories") ? 'active' : '' }}" href="/categories">Categories</a></li>
-            <li><a class="nav-link {{ ($active === "posts") ? 'active' : '' }}" href="/blog">Posts</a></li>
+            <li><a class="nav-link {{ Request::is('/') ? 'active' : '' }}" href="/">Home</a></li>
+            <li><a class="nav-link {{ Request::is('about') ? 'active' : '' }}" href="/about">About</a></li>
+            <li><a class="nav-link {{ Request::is('categories') ? 'active' : '' }}" href="/categories">Categories</a></li>
+            <li><a class="nav-link {{ Request::is('blog') ? 'active' : '' }}" href="/blog">Posts</a></li>
           </ul>
 
           <ul class="navbar-nav ms-auto">
@@ -25,11 +25,12 @@
                     <form action="/logout" method="post">
                       @csrf
                       <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-left"> </i>Logout</button>
+                    </form>
                   </li>
                 </ul>
               </li>
             @else
-                <li class="nav-item"><a class="nav-link {{ ($active === "login") ? 'active' : '' }}" href="/login"><i class="bi bi-box-arrow-in-right"> </i>Login</a></li>
+                <li class="nav-item"><a class="nav-link {{ Request::is('login') ? 'active' : '' }}" href="/login"><i class="bi bi-box-arrow-in-right"> </i>Login</a></li>
             @endauth
           </ul>
         </div>
