@@ -6,7 +6,13 @@
   </div>
 
   <div class="table-responsive col-lg-10">
-    <a class="btn btn-primary mt-2" href="/dashboard/posts/create">Create new Post</a>
+    <a class="btn btn-primary mt-1 mb-2" href="/dashboard/posts/create">Create new Post</a>
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ session('success') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
     <table class="table table-striped table-sm">
       <thead>
         <tr>
