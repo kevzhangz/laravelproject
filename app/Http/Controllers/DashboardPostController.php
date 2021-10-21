@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 
 class DashboardPostController extends Controller
@@ -18,7 +19,7 @@ class DashboardPostController extends Controller
     public function index()
     {
         return view('dashboard.posts.index', [
-            'posts' => Post::where('user_id', auth()->user()->id)->get()
+            'posts' => Post::where('user_id', auth()->user()->id)->latest()->get()
         ]);
     }
 
@@ -42,19 +43,26 @@ class DashboardPostController extends Controller
      */
     public function store(Request $request)
     {
-       $validatedData = $request->validate([
+
+        $validatedData = $request->validate([
            'title' => 'required',
            'slug' => 'required|unique:posts',
            'category_id' => 'required',
            'body' => 'required',
-       ]);
+           'image' => 'image',
+        ]);
 
-       $validatedData['user_id'] = auth()->user()->id;
-       $validatedData['excerpt'] = Str::limit(strip_tags($request->body), 100);
+        if($request->file('image')) {
+            $request->file('image')->store('post_image');
+            $validatedData['image'] = $request->file('image')->store('post_image');
+        }
 
-       Post::create($validatedData);
+        $validatedData['user_id'] = auth()->user()->id;
+        $validatedData['excerpt'] = Str::limit(strip_tags($request->body), 100);
 
-       return redirect('/dashboard/posts')->with('success', 'New Post has been created!');
+        Post::create($validatedData);
+
+        return redirect('/dashboard/posts')->with('success', 'New Post has been created!');
     }
 
     /**
@@ -65,6 +73,10 @@ class DashboardPostController extends Controller
      */
     public function show(Post $post)
     {
+        if($post->author->id !== auth()->user()->id) {
+            abort(403);
+        }
+
         return view('dashboard.posts.show',[
             'post' => $post
         ]);
@@ -78,7 +90,14 @@ class DashboardPostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        if($post->author->id !== auth()->user()->id) {
+            abort(403);
+        }
+
+        return view('dashboard.posts.edit', [
+            'post' => $post,
+            'categories' => Category::all()
+        ]);
     }
 
     /**
@@ -90,7 +109,26 @@ class DashboardPostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $rules = [
+            'title' => 'required',
+            'category_id' => 'required',
+            'body' => 'required',
+            'image' => 'image'
+        ];
+
+        if($request->slug != $post->slug) $rules['slug'] = 'required|unique:posts';
+        $validatedData = $request->validate($rules);
+
+        if($request->file('image')) {
+            $validatedData['image'] = $request->file('image')->store('post_image');
+            Storage::delete($post->image);
+        }
+
+        $validatedData['excerpt'] = Str::limit(strip_tags($request->body), 100);
+
+        $post->update($validatedData);
+
+        return redirect()->route('posts.index')->with('success','Post successfully updated!');
     }
 
     /**
@@ -101,7 +139,11 @@ class DashboardPostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        Storage::delete($post->image);
+        $post->delete();
+        
+
+        return redirect()->route('posts.index')->with('success','Post successfully deleted!');
     }
 
     public function checkSlug(Request $request)

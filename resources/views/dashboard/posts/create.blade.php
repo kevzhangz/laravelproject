@@ -5,7 +5,7 @@
         <h1 class="h2">Create New Post</h1>
     </div>
     <div class="col-lg-6">
-        <form action="/dashboard/posts" method="POST">
+        <form action="/dashboard/posts" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
@@ -14,7 +14,7 @@
                     <div class="invalid-feedback">
                         {{ $message }}
                     </div>
-                    @enderror
+                @enderror
                 <div class="mb-3">
             </div>
                 <label for="slug" class="form-label">Slug</label>
@@ -38,11 +38,21 @@
                 </select>
             </div>
             <div class="mb-3">
+                <label for="image" class="form-label d-block">Post Image</label>
+                <img class="img-preview img-fluid mb-3 col-sm-5">
+                <input class="form-control" name="image" type="file" id="image" onchange="imgPreview()">
+                @error('image')
+                    <div class="text-danger">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+            <div class="mb-3">
                 <label for="body" class="form-label">Content</label>
                 <input id="body" type="hidden" value="{{ old('body') }}" name="body">
                 <trix-editor input="body"></trix-editor>
                 @error('body')
-                    <p class="text-danger   ">
+                    <p class="text-danger">
                         {{ $message }}
                     </p>
                 @enderror
@@ -64,5 +74,19 @@
         document.addEventListener('trix-file-accept', function() {
             e.preventDefault();
         })
+
+        function imgPreview() {
+            const image = document.querySelector('#image')
+            const preview = document.querySelector('.img-preview')
+
+            preview.style.display = 'block'
+
+            const oFReader = new FileReader();
+            oFReader.readAsDataURL(image.files[0])
+
+            oFReader.onload = function(oFREvent) {
+                preview.src = oFREvent.target.result;
+            }
+        }
     </script>
 @endsection
