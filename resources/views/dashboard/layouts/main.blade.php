@@ -44,8 +44,14 @@
   <div class="row">
 
 @include('dashboard/layouts/sidebar')
-
+    
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      @cannot('verified')
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          Please Verify your email <a class="text-decoration-none" href="{{ route('verification.notice') }}">Click here to verify</a>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      @endcannot
       @yield('container')
     </main>
   </div>

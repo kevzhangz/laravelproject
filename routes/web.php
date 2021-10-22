@@ -8,8 +8,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardPostController;
-
-
+use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,44 +22,24 @@ use App\Http\Controllers\DashboardPostController;
 |
 */
 
-Route::get('/', function () {
-    return view('home', [
-        'title' => 'Home',
-        'active' => 'home'
-    ]);
-});
-
-Route::get('/about', function () {
-    return view('about', [
-        'title' => 'About',
-        'name' => 'Kevin',
-        'img' => 'hhh.png',
-        'active' => 'about'
-    ]);
-});
+Route::get('/', [HomeController::class, 'index']);
+Route::get('/categories', [HomeController::class, 'categories']);
+Route::get('/about', [HomeController::class, 'about']);
 
 Route::get('/blog', [PostController::class, 'index']);
 Route::get('/blog/{post:slug}', [PostController::class, 'show']);
 
-Route::get('/categories', function() {
-    return view('categories', [
-        'title' => 'Categories',
-        'active' => 'categories',
-        'categories' => Category::all()
-    ]);
-});
-
 Route::get('/login', [LoginController::class, 'index'])->middleware('guest')->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout']);
-
-Route::get('/register', [RegisterController::class, 'index'])->middleware('guest');
+Route::get('/register', [RegisterController::class, 'index']);
 Route::post('/register', [RegisterController::class, 'store']);
 
-Route::get('/dashboard', function() {
-    return view ('dashboard.index');
-})->middleware('auth');
+Route::get('/email/verify', [EmailVerificationController::class, 'index'])->name('verification.notice');
+Route::post('/email/verify/verification-notification', [EmailVerificationController::class, 'sendEmail'])->name('verification.send');
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware('signed')->name('verification.verify');
 
-Route::get('/dashboard/posts/checkSlug', [DashboardPostController::class, 'checkSlug'])->middleware('auth');
-Route::resource('/dashboard/posts', DashboardPostController::class)->middleware('auth');
-Route::resource('/dashboard/categories', AdminCategoriesController::class)->middleware('admin')->except('show');
+Route::get('/dashboard', [DashboardController::class, 'index']);
+Route::get('/dashboard/posts/checkSlug', [DashboardPostController::class, 'checkSlug']);
+Route::resource('/dashboard/posts', DashboardPostController::class);
+Route::resource('/dashboard/categories', AdminCategoriesController::class);

@@ -5,9 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('guest');
+    }
+
     public function index()
     {
         return view('register.index', [
@@ -26,8 +32,9 @@ class RegisterController extends Controller
 
         $validatedData['password'] = Hash::make($validatedData['password']);
 
-        User::create($validatedData);
+        $user = User::create($validatedData);
+        event(new Registered($user));
         
-        return redirect('/login')->with('success','Registration success! Please login.');
+        return redirect('/login')->with('success','Registration success! Please login and verify your email.');
     }
 }
